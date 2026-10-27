@@ -1,36 +1,25 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 备件系统 · UI 布局样卡
 
-## Getting Started
+壳层加 20 个路由页的布局样卡。每页三套可交互预览（A / B / C），推荐默认都是 A。用来选定布局，不改备件系统仓库里的代码。
 
-First, run the development server:
+## 本地运行
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+npx next dev -p 4317 -H 0.0.0.0
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+打开 [http://127.0.0.1:4317](http://127.0.0.1:4317)。
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 怎么看
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- 索引页按「壳层 / 作业 / 数据 / 管理 / 其他」分组。点卡片进入该页预览。
+- 预览顶部切换 A / B / C，以及自适应、1440、平板、手机宽度。
+- 右侧备注写了推荐理由、优缺点，以及落到 Vue 侧大概要动哪些块。
+- 点「设为落地」记下选择（存在浏览器 localStorage，键名 `layout-samples.picks.v2`）。
+- 回到索引，点「复制落地清单」得到一份可粘贴的选型结果。
+- 键盘：`←` `→` 翻页，`1` `2` `3` 或 `a` `b` `c` 切方案，`P` 记下当前方案，`Esc` 关闭页选择器。
 
-## Learn More
+单页直达：`/s/query/A`。去掉样卡外框的画面在 `/f/query/A`。
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+登录样卡的输入框是只读的，不收集工号或密码。

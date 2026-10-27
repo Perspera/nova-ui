@@ -2,8 +2,6 @@ import { notFound } from "next/navigation";
 import { Viewer } from "@/components/gallery/viewer";
 import { PAGES, VARIANT_KEYS, getPage, isVariant } from "@/samples/registry";
 
-export const instant = false;
-
 export function generateStaticParams() {
   return PAGES.flatMap((p) => VARIANT_KEYS.map((v) => ({ slug: p.slug, variant: v })));
 }

@@ -316,19 +316,51 @@ function Stage({ slug, variant, device }: { slug: string; variant: VariantKey; d
 
   const isPhone = device === "mobile";
   const ready = size.w > 0;
+  const fit = device === "fit";
+  const markLoaded = (key: string) => setLoaded((s) => (s[key] ? s : { ...s, [key]: true }));
+
+  // Iframe load often finishes before React attaches onLoad, which leaves the spinner up.
+  React.useEffect(() => {
+    const root = ref.current;
+    if (!root) return;
+    const sync = () => {
+      let pending = false;
+      root.querySelectorAll("iframe").forEach((node) => {
+        const frame = node as HTMLIFrameElement;
+        const src = frame.getAttribute("src") || "";
+        const key = src.replace(/^\/f\//, "");
+        let done = false;
+        try {
+          const doc = frame.contentDocument;
+          done = Boolean(doc && doc.readyState === "complete" && src && doc.URL.includes(src));
+        } catch {
+          done = false;
+        }
+        if (done) markLoaded(key);
+        else pending = true;
+      });
+      return pending;
+    };
+    if (!sync()) return;
+    const timer = window.setInterval(() => {
+      if (!sync()) window.clearInterval(timer);
+    }, 200);
+    return () => window.clearInterval(timer);
+  }, [slug, device, ref]);
 
   return (
     <div ref={ref} className="bg-dots relative min-w-0 flex-1 overflow-hidden">
-      {ready && (
+      {(fit || ready) && (
         <div className="absolute inset-0 flex items-start justify-center" style={{ padding: pad }}>
           <div
             className={cn(
               "relative shrink-0 overflow-hidden bg-white",
+              fit && "h-full w-full",
               isPhone
                 ? "rounded-[34px] shadow-[0_0_0_7px_#0f172a,0_30px_60px_-20px_rgb(15_23_42/0.45)]"
                 : "rounded-xl shadow-[0_0_0_1px_rgb(15_23_42/0.08),0_24px_48px_-16px_rgb(15_23_42/0.25)]",
             )}
-            style={{ width: w * scale, height: h * scale }}
+            style={fit ? undefined : { width: w * scale, height: h * scale }}
           >
             {VARIANT_KEYS.map((k) => {
               const key = `${slug}/${k}`;
@@ -338,9 +370,13 @@ function Stage({ slug, variant, device }: { slug: string; variant: VariantKey; d
                   key={key}
                   src={`/f/${slug}/${k}`}
                   title={`${slug} ${k}`}
-                  onLoad={() => setLoaded((s) => ({ ...s, [key]: true }))}
-                  className={cn("absolute top-0 left-0 border-0 bg-white transition-opacity duration-150", on ? "opacity-100" : "pointer-events-none opacity-0")}
-                  style={{ width: w, height: h, transform: `scale(${scale})`, transformOrigin: "0 0" }}
+                  onLoad={() => markLoaded(key)}
+                  className={cn(
+                    "absolute top-0 left-0 border-0 bg-white transition-opacity duration-150",
+                    fit && "size-full",
+                    on ? "opacity-100" : "pointer-events-none opacity-0",
+                  )}
+                  style={fit ? undefined : { width: w, height: h, transform: `scale(${scale})`, transformOrigin: "0 0" }}
                 />
               );
             })}
